@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Javascript experiment number 1</title>
+	<style type="text/css">
+		html, body {
+			width: 100%;
+			height: 100%;
+			margin: 0;
+			padding: 0;
+			background-color:black;
+		}
+		#canvas {
+			width: 100%;
+			height: 100%;
+			position: fixed;
+			top: 0;
+			left: 0;
+			opacity: 0.2;
+			background: radial-gradient(circle, #fff, #777);
+		}
+		span {
+			position: fixed;
+			font-family: monospace, sans-serif;
+			font-size: 1.1em;
+			font-weight: 800;
+			color:rgba(100,100,100,0.7);
+			bottom:10px;
+			right:20px;
+		}
+		p{
+			position: fixed;
+			font-family: monospace, sans-serif;
+			font-size: 1.1em;
+			font-weight: 800;
+			color:rgba(100,100,100,0.7);
+			top:50px;
+			left:50px;
+		}
+	</style>
+</head>
+<body>
+	<p>First time trying canvas with plain javascript,<br/>just messing arround with simple trigonometry.</p>
+	<span>© 2016 Ricardo Magalhães</span>
+	<canvas id="canvas"></canvas>
+	<script type="text/javascript">
+		/*
+			standard requestAnimationFrame callback setup
+		*/
+		window.requestAnimationFrame = window.requestAnimationFrame
+		                               || window.mozRequestAnimationFrame
+		                               || window.webkitRequestAnimationFrame
+		                               || window.msRequestAnimationFrame
+		                               || function(f){return setTimeout(f, 1000/60)}
+		window.cancelAnimationFrame = window.cancelAnimationFrame
+		                              || window.mozCancelAnimationFrame
+		                              || function(requestID){clearTimeout(requestID)} //fall back
+
+		let canvas = document.getElementById("canvas")
+		let context = canvas.getContext("2d")
+		let largura, altura;
+
+		let quads = [];
+
+		window.onload = function () {
+			console.log("page loaded!")
+			canvas.width = largura = 200
+			canvas.height = altura = largura * (innerHeight / innerWidth)
+			
+			for(w = -4; w <= (largura >> 5) +3; w++){
+				for(h = -4; h <= (altura >> 5) +3; h++){
+					quads.push({x: w << 5, y: h << 5, w: largura >> 4, h: largura >> 4, cor: w*h});
+				}
+			}
+			
+			draw()
+		}
+
+		/*
+			let prevFrameTime;
+
+			if( time ) {
+				console.log("tempo entre frames: " + (time - prevFrameTime) / 1000);
+				console.log("fps: " + (1 / ((time - prevFrameTime) / 1000)))
+			}
+
+			prevFrameTime = time;
+		*/
+
+		inc = 0.01;
+		timer = 0;
+		rng1=((Math.random()+0.41)*2.2);
+
+		function draw(time = 0) {
+
+			timer = time * 0.1;
+			context.clearRect(0,0,largura,altura)
+			context.globalAlpha = 1/1;
+			// context.globalCompositeOperation='lighter';
+			context.shadowBlur = 6;
+			context.shadowColor = "#000";
+			context.save()
+			context.translate(largura*0.5, altura*0.5)
+			context.rotate(Math.sin(timer*0.001) + timer*0.001)
+			quads.forEach(quad => {		
+				
+
+				gap = Math.cos(quad.x - timer*0.001) * (Math.abs(Math.cos(timer*0.001)*10));	
+				offsetX =	(quad.x + Math.cos(quad.x + timer * 0.01) * Math.abs(Math.cos(timer*0.001)*30)) -largura*0.5;		
+				offsetY = (quad.y + Math.sin(quad.y + timer * 0.01) * Math.abs(Math.sin(timer*0.001)*30)) - altura*0.5;
+				
+				context.fillStyle = "#aaa";
+				context.fillRect(offsetX+gap,offsetY+gap,quad.w*rng1-gap*2,quad.h*rng1-gap*2);
+				
+			})
+			
+			context.restore()
+			requestAnimationFrame(draw);
+			
+		}
+	</script>
+</body>
+</html>
